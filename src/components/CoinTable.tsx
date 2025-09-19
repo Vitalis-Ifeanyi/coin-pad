@@ -8,7 +8,13 @@ interface CoinTableProps {
 }
 
 const CoinTable: React.FC<CoinTableProps> = ({ coins }) => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   return (
     <div

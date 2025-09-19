@@ -3,7 +3,13 @@ import { Github, Twitter, Linkedin } from "lucide-react";
 import { DarkModeContext } from "../context/DarkModeContext";
 
 const Footer: React.FC = () => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const bgColor = isDark ? "bg-gray-900" : "bg-gray-100";
   const textColor = isDark ? "text-gray-300" : "text-gray-600";

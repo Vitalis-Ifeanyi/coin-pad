@@ -12,7 +12,13 @@ const AnalyticsHero: React.FC<AnalyticsHeroProps> = ({
   subtitle = "Track, visualize, and export real-time candlestick data of your favorite cryptocurrencies. Analyze trends, compare multiple coins, and make data-driven investment decisions with ease. Our dashboard provides intuitive charts, flexible timeframes, and customizable export options for your analytics workflow.",
   illustrationSrc = "/ana-hero.jpg",
 }) => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const bgGradient = isDark ? "from-gray-0 to-gray-900" : "from- to-indigo-300";
 

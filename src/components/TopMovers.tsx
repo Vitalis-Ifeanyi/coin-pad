@@ -8,7 +8,13 @@ interface TopMoversProps {
 }
 
 const TopMovers: React.FC<TopMoversProps> = ({ coins }) => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const movers = [...coins]
     .sort(

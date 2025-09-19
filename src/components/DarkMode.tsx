@@ -2,7 +2,13 @@ import { useContext } from "react";
 import { DarkModeContext } from "../context/DarkModeContext";
 
 const DarkModeToggle = () => {
-  const { isDark, toggleDarkMode } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark, toggleDarkMode } = context;
 
   return (
     <label className="relative inline-flex items-center cursor-pointer">

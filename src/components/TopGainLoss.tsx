@@ -9,7 +9,13 @@ interface TopGainersLosersProps {
 }
 
 const TopGainersLosers: React.FC<TopGainersLosersProps> = ({ coins }) => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const gainers = [...coins]
     .sort(

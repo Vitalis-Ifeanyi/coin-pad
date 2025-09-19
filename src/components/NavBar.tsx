@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // Lucide icons
+import { Menu, X } from "lucide-react";
 import DarkModeToggle from "./DarkMode";
 
 const navData = [

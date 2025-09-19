@@ -3,7 +3,13 @@ import { Info, TrendingUp, BarChart3 } from "lucide-react";
 import { DarkModeContext } from "../context/DarkModeContext";
 
 const InfoCards: React.FC = () => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const cardBg = isDark ? "bg-gray-800 text-white" : "bg-white text-gray-800";
   const textSecondary = isDark ? "text-gray-400" : "text-gray-600";

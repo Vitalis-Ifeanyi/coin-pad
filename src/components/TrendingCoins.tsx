@@ -7,7 +7,13 @@ interface TrendingCoinsProps {
 }
 
 const TrendingCoins: React.FC<TrendingCoinsProps> = ({ trending }) => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const cardBg = isDark ? "bg-gray-800 text-white" : "bg-white text-gray-800";
   const itemBg = isDark

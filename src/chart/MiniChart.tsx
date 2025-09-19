@@ -15,7 +15,14 @@ const MiniChart: React.FC<MiniChartProps> = ({
   width = 100,
   height = 40,
 }) => {
-  const { isDark } = useContext(DarkModeContext);
+  
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
   const data = prices.map((p, i) => ({ price: p, index: i }));
 
   return (

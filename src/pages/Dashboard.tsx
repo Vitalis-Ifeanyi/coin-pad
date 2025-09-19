@@ -23,7 +23,13 @@ const Dashboard: React.FC = () => {
   const [marketStats, setMarketStats] = useState<any>(null);
   const [trending, setTrending] = useState<any[]>([]);
   const [recentlyAdded, setRecentlyAdded] = useState<Coin[]>([]);
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   const handleClear = () => setSearchTerm("");
 

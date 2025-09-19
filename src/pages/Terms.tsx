@@ -8,7 +8,13 @@ const CryptoTermsPage: React.FC = () => {
     term: string;
     definition: string;
   }
-  const { isDark } = useContext(DarkModeContext);
+   const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
   const [searchTerm, setSearchTerm] = useState("");
 
   const cryptoTerms: Term[] = [

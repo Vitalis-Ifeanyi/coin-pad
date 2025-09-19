@@ -8,7 +8,13 @@ interface RecentlyAddedCoinsProps {
 }
 
 const RecentlyAddedCoins: React.FC<RecentlyAddedCoinsProps> = ({ coins }) => {
-  const { isDark } = useContext(DarkModeContext);
+  const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
