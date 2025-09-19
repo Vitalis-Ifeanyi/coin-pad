@@ -62,7 +62,6 @@ const TopMovers: React.FC<TopMoversProps> = ({ coins }) => {
                 </p>
               </div>
             </div>
-            \
             <div className="w-24 h-10">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
