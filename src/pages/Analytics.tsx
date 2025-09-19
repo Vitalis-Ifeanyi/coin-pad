@@ -255,11 +255,9 @@ const AnalyticsPage: React.FC = () => {
                       style: {
                         fontSize: "14px",
                         fontFamily: "inherit",
-                        color: isDark ? "#f9fafb" : "#111827",
                       },
                       fillSeriesColor: false,
                       custom: function ({
-                        series,
                         seriesIndex,
                         dataPointIndex,
                         w,

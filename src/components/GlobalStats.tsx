@@ -1,6 +1,5 @@
 // components/GlobalStats.tsx
-import React, { useContext } from "react";
-import { DarkModeContext } from "../context/DarkModeContext";
+import React from "react";
 
 interface GlobalStatsProps {
   marketStats: any;
@@ -14,13 +13,6 @@ import active from "/active.jpg";
 import markets from "/market.jpg";
 
 const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
-   const context = useContext(DarkModeContext);
-
-  if (!context) {
-    throw new Error("Terms must be used within a DarkModeProvider");
-  }
-
-  const { isDark } = context;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

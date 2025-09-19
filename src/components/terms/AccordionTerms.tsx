@@ -8,7 +8,13 @@ interface Term {
 }
 
 export const AccordionTerms: React.FC<{ term: Term }> = ({ term }) => {
-  const { isDark } = useContext(DarkModeContext);
+   const context = useContext(DarkModeContext);
+
+  if (!context) {
+    throw new Error("Terms must be used within a DarkModeProvider");
+  }
+
+  const { isDark } = context;
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
