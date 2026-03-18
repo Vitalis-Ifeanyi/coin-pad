@@ -50,7 +50,7 @@ const TopGainersLosers: React.FC<TopGainersLosersProps> = ({ coins }) => {
           <p
             className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}
           >
-            ${coin.current_price.toLocaleString()}
+            ${coin.current_price?.toLocaleString() ?? 'N/A'}
           </p>
         </div>
       </div>
@@ -66,12 +66,14 @@ const TopGainersLosers: React.FC<TopGainersLosersProps> = ({ coins }) => {
 
       <span
         className={`text-sm font-semibold ${
-          coin.price_change_percentage_24h > 0
+          coin.price_change_percentage_24h != null && coin.price_change_percentage_24h > 0
             ? "text-green-500"
-            : "text-red-500"
+            : coin.price_change_percentage_24h != null && coin.price_change_percentage_24h < 0
+            ? "text-red-500"
+            : "text-gray-500"
         }`}
       >
-        {coin.price_change_percentage_24h.toFixed(2)}%
+        {coin.price_change_percentage_24h?.toFixed(2) ?? 'N/A'}%
       </span>
     </div>
   );

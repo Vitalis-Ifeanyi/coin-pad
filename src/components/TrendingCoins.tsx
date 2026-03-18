@@ -75,7 +75,7 @@ const TrendingCoins: React.FC<TrendingCoinsProps> = ({ trending }) => {
                 </div>
               </div>
 
-              {coin.data?.price_usd && (
+              {coin.data?.price_usd && !isNaN(parseFloat(coin.data.price_usd)) && (
                 <span className="text-sm font-semibold">
                   ${parseFloat(coin.data.price_usd).toFixed(2)}
                 </span>

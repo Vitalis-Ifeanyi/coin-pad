@@ -24,7 +24,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
         />
         <p className="text-sm opacity-80">Total Market Cap</p>
         <h3 className="text-xl font-bold mt-2">
-          ${marketStats.total_market_cap.usd.toLocaleString()}
+          ${marketStats.total_market_cap?.usd?.toLocaleString() ?? 'N/A'}
         </h3>
       </div>
 
@@ -32,7 +32,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
         <img src={hours} alt="24h Volume" className="w-10 h-10 mb-2" />
         <p className="text-sm opacity-80">24h Volume</p>
         <h3 className="text-xl font-bold mt-2">
-          ${marketStats.total_volume.usd.toLocaleString()}
+          ${marketStats.total_volume?.usd?.toLocaleString() ?? 'N/A'}
         </h3>
       </div>
 
@@ -44,7 +44,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
         />
         <p className="text-sm opacity-80">BTC Dominance</p>
         <h3 className="text-xl font-bold mt-2">
-          {marketStats.market_cap_percentage.btc.toFixed(2)}%
+          {marketStats.market_cap_percentage?.btc?.toFixed(2) ?? 'N/A'}%
         </h3>
       </div>
 
@@ -52,7 +52,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
         <img src={ethIcon} alt="ETH Logo" className="w-10 h-10 mb-2" />
         <p className="text-sm opacity-80">ETH Dominance</p>
         <h3 className="text-xl font-bold mt-2">
-          {marketStats.market_cap_percentage.eth.toFixed(2)}%
+          {marketStats.market_cap_percentage?.eth?.toFixed(2) ?? 'N/A'}%
         </h3>
       </div>
 
@@ -64,7 +64,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
         />
         <p className="text-sm opacity-80">Active Cryptos</p>
         <h3 className="text-xl font-bold mt-2">
-          {marketStats.active_cryptocurrencies.toLocaleString()}
+          {marketStats.active_cryptocurrencies?.toLocaleString() ?? 'N/A'}
         </h3>
       </div>
 
@@ -76,7 +76,7 @@ const GlobalStats: React.FC<GlobalStatsProps> = ({ marketStats }) => {
         />
         <p className="text-sm opacity-80">Markets</p>
         <h3 className="text-xl font-bold mt-2">
-          {marketStats.markets.toLocaleString()}
+          {marketStats.markets?.toLocaleString() ?? 'N/A'}
         </h3>
       </div>
     </div>

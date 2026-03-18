@@ -42,7 +42,7 @@ const CoinDetailsModal: React.FC<CoinDetailsModalProps> = ({
               {coin.name} ({coin.symbol.toUpperCase()})
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300">
-              ${coin.current_price.toLocaleString()}
+              ${coin.current_price?.toLocaleString() ?? 'N/A'}
             </p>
           </div>
         </div>
@@ -50,29 +50,31 @@ const CoinDetailsModal: React.FC<CoinDetailsModalProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2 text-gray-800 dark:text-gray-200">
             <p>
-              <strong>Market Cap:</strong> ${coin.market_cap.toLocaleString()}
+              <strong>Market Cap:</strong> ${coin.market_cap?.toLocaleString() ?? 'N/A'}
             </p>
             <p>
               <strong>24h Change:</strong>{" "}
               <span
                 className={
-                  coin.price_change_percentage_24h > 0
+                  coin.price_change_percentage_24h != null && coin.price_change_percentage_24h > 0
                     ? "text-green-500"
-                    : "text-red-500"
+                    : coin.price_change_percentage_24h != null && coin.price_change_percentage_24h < 0
+                    ? "text-red-500"
+                    : "text-gray-500"
                 }
               >
-                {coin.price_change_percentage_24h.toFixed(2)}%
+                {coin.price_change_percentage_24h?.toFixed(2) ?? 'N/A'}%
               </span>
             </p>
             <p>
-              <strong>All-Time High:</strong> ${coin.ath.toLocaleString()}
+              <strong>All-Time High:</strong> ${coin.ath?.toLocaleString() ?? 'N/A'}
             </p>
             <p>
-              <strong>All-Time Low:</strong> ${coin.atl.toLocaleString()}
+              <strong>All-Time Low:</strong> ${coin.atl?.toLocaleString() ?? 'N/A'}
             </p>
             <p>
               <strong>Circulating / Total Supply:</strong>{" "}
-              {coin.circulating_supply.toLocaleString()} /{" "}
+              {coin.circulating_supply?.toLocaleString() ?? 'N/A'} /{" "}
               {coin.total_supply?.toLocaleString() || "N/A"}
             </p>
             <p>

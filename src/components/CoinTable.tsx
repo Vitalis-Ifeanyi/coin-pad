@@ -66,22 +66,24 @@ const CoinTable: React.FC<CoinTableProps> = ({ coins }) => {
                   </span>
                 </td>
                 <td className="py-3 px-4">
-                  ${coin.current_price.toLocaleString()}
+                  ${coin.current_price?.toLocaleString() ?? 'N/A'}
                 </td>
                 <td className="py-3 px-4">
-                  ${coin.market_cap.toLocaleString()}
+                  ${coin.market_cap?.toLocaleString() ?? 'N/A'}
                 </td>
                 <td
                   className={`py-3 px-4 font-medium ${
-                    coin.price_change_percentage_24h > 0
+                    coin.price_change_percentage_24h != null && coin.price_change_percentage_24h > 0
                       ? "text-green-500"
-                      : "text-red-500"
+                      : coin.price_change_percentage_24h != null && coin.price_change_percentage_24h < 0
+                      ? "text-red-500"
+                      : "text-gray-500"
                   }`}
                 >
-                  {coin.price_change_percentage_24h.toFixed(2)}%
+                  {coin.price_change_percentage_24h?.toFixed(2) ?? 'N/A'}%
                 </td>
                 <td className="py-3 px-4">
-                  ${coin.total_volume.toLocaleString()}
+                  ${coin.total_volume?.toLocaleString() ?? 'N/A'}
                 </td>
               </tr>
             ))

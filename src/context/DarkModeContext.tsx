@@ -16,8 +16,6 @@ export const DarkModeProvider: React.FC<{ children: ReactNode }> = ({
   const [isDark, setIsDark] = useState(false);
 
   const toggleDarkMode = () => setIsDark((prev) => !prev);
-
-  // 🔑 Sync Tailwind "dark" mode with <html>
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");

@@ -49,27 +49,40 @@ const Dashboard: React.FC = () => {
           },
         });
 
-        const statsRes = await api.get("/global");
-        const trendingRes = await api.get("/search/trending");
+        setCoins(res.data);
+        setFilteredCoins(res.data);
 
         // 🔹 Recently Added Coins (sort by market_cap_rank descending)
         const recentlyAddedCoins = [...res.data]
           .sort((a, b) => b.market_cap_rank - a.market_cap_rank)
           .slice(0, 5);
-
-        setCoins(res.data);
-        setFilteredCoins(res.data);
-        setMarketStats(statsRes.data.data);
-        setTrending(trendingRes.data.coins);
         setRecentlyAdded(recentlyAddedCoins);
       } catch (err) {
         setError(
           `⚠️ Failed to fetch market data. Try again later. error: ${err}`
         );
         console.error(err);
-      } finally {
         setLoading(false);
+        return;
       }
+
+      try {
+        const statsRes = await api.get("/global");
+        setMarketStats(statsRes.data.data);
+      } catch (err) {
+        console.error("Failed to fetch global stats:", err);
+        setMarketStats(null);
+      }
+
+      try {
+        const trendingRes = await api.get("/search/trending");
+        setTrending(trendingRes.data.coins);
+      } catch (err) {
+        console.error("Failed to fetch trending coins:", err);
+        setTrending([]);
+      }
+
+      setLoading(false);
     };
 
     fetchData();
