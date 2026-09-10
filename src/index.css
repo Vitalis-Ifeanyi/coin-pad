@@ -1,11 +1,121 @@
 @import "tailwindcss";
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
-  margin: 0;
-  padding: 0;
+
+/* Drive `dark:` from the .dark class (set by ThemeProvider), not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --canvas: #f6f5f1;
+  --surface: #ffffff;
+  --sunken: #efede7;
+  --line: #e3e0d8;
+  --line-strong: #cfcbc0;
+  --fg: #1b1a17;
+  --muted: #6b685f;
+  --faint: #9b978c;
+  --up: #177245;
+  --down: #c4352b;
+  --up-soft: #e3f1e8;
+  --down-soft: #f8e4e1;
+  --focus: #2f6fdd;
+  color-scheme: light;
 }
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+
+.dark {
+  --canvas: #111110;
+  --surface: #191917;
+  --sunken: #0c0c0b;
+  --line: #2a2926;
+  --line-strong: #3b3a35;
+  --fg: #eceae4;
+  --muted: #a09d93;
+  --faint: #6f6c64;
+  --up: #3fb97a;
+  --down: #f0645a;
+  --up-soft: #15291d;
+  --down-soft: #321816;
+  --focus: #6d9cf0;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-up-soft: var(--up-soft);
+  --color-down-soft: var(--down-soft);
+  --color-focus: var(--focus);
+}
+
+@layer base {
+  html {
+    background: var(--canvas);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--line);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--focus) 25%, transparent);
+  }
+
+  dialog::backdrop {
+    background: rgb(12 12 11 / 0.45);
+  }
+}
+
+@utility num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ApexCharts: make the built-in chrome follow our tokens. */
+.apexcharts-toolbar {
+  z-index: 1 !important;
+}
+.apexcharts-canvas .apexcharts-zoom-icon.apexcharts-selected {
+  background: var(--sunken);
+  color: var(--fg);
+}
+.apexcharts-tooltip.apexcharts-theme-light,
+.apexcharts-tooltip.apexcharts-theme-dark {
+  background: var(--surface) !important;
+  border: 1px solid var(--line-strong) !important;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12) !important;
+  color: var(--fg) !important;
+}
+.apexcharts-xaxistooltip {
+  background: var(--surface) !important;
+  border-color: var(--line-strong) !important;
+  color: var(--fg) !important;
+}
+.apexcharts-xaxistooltip::before,
+.apexcharts-xaxistooltip::after {
+  display: none;
 }

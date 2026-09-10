@@ -1,77 +1,50 @@
-import React, { useContext } from "react";
-import { Github, Twitter, Linkedin } from "lucide-react";
-import { DarkModeContext } from "../context/DarkModeContext";
+import { Github, Linkedin, Twitter } from "lucide-react";
 
-const Footer: React.FC = () => {
-  const context = useContext(DarkModeContext);
+const socials = [
+  { label: "GitHub", href: "https://github.com/Vitalis-Ifeanyi", Icon: Github },
+  { label: "X / Twitter", href: "https://twitter.com/delegends", Icon: Twitter },
+  { label: "LinkedIn", href: "https://linkedin.com/in/ifeanyi-vitalis-nwokolo", Icon: Linkedin },
+];
 
-  if (!context) {
-    throw new Error("Terms must be used within a DarkModeProvider");
-  }
-
-  const { isDark } = context;
-
-  const bgColor = isDark ? "bg-gray-900" : "bg-gray-100";
-  const textColor = isDark ? "text-gray-300" : "text-gray-600";
-  const linkColor = isDark
-    ? "text-blue-400 hover:underline"
-    : "text-blue-600 hover:underline";
-
+export default function Footer() {
   return (
-    <footer
-      className={`${bgColor} border-t pt-10 transition-colors duration-300`}
-    >
-      <div
-        className={`max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center ${textColor} text-sm`}
-      >
-        {/* Left: Copyright */}
-        <p className="mb-3 md:mb-0">
-          © {new Date().getFullYear()} COIN PAD. All rights reserved.
-        </p>
-
-        {/* Middle: API credit */}
-        <p className="mb-3 md:mb-0">
-          Data powered by{" "}
-          <a
-            href="https://www.coingecko.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={linkColor}
-          >
-            CoinGecko API
-          </a>
-        </p>
-
-        {/* Right: Social Links */}
-        <div className="flex gap-4">
-          <a
-            href="https://github.com/Vitalis-Ifeanyi"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-500 transition"
-          >
-            <Github size={18} />
-          </a>
-          <a
-            href="https://twitter.com/delegends"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-500 transition"
-          >
-            <Twitter size={18} />
-          </a>
-          <a
-            href="https://linkedin.com/in/ifeanyi-vitalis-nwokolo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-500 transition"
-          >
-            <Linkedin size={18} />
-          </a>
+    <footer className="mt-16 border-t border-line">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="space-y-1">
+          <p>
+            Market data from{" "}
+            <a
+              href="https://www.coingecko.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-fg underline decoration-line-strong underline-offset-2 hover:decoration-fg"
+            >
+              CoinGecko
+            </a>
+            . Prices can lag by a minute or two.
+          </p>
+          <p className="text-faint">
+            © {new Date().getFullYear()} Coinpad · Built by Ifeanyi Vitalis. Nothing here is financial advice.
+          </p>
         </div>
+
+        <ul className="flex gap-1">
+          {socials.map(({ label, href, Icon }) => (
+            <li key={label}>
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                title={label}
+                className="grid size-8 place-items-center rounded-md text-muted hover:bg-sunken hover:text-fg"
+              >
+                <Icon size={16} strokeWidth={1.75} />
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

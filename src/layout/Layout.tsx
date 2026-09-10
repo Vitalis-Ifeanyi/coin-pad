@@ -1,18 +1,19 @@
-import React from "react";
-import Navbar from "../components/NavBar";
-import Footer from "../components/Footer";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import { Spinner } from "../components/States";
 
-const Layout: React.FC = () => {
+export default function Layout() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow mx-auto w-full ">
-        <Outlet />
+    <div className="flex min-h-screen flex-col">
+      <NavBar />
+      <main className="w-full flex-1">
+        <Suspense fallback={<Spinner className="py-32" />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </div>
   );
-};
-
-export default Layout;
+}

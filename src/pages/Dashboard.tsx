@@ -1,183 +1,91 @@
-import React, { useEffect, useState, useContext } from "react";
-import api from "../api/coingecko";
-import type { Coin } from "../types/coin";
+import { Link } from "react-router-dom";
+import { useApi } from "../hooks/useApi";
+import type { Coin, GlobalMarket, TrendingCoin } from "../types/coin";
+import { formatCompactCurrency, formatPercent } from "../lib/format";
+import MarketStats from "../components/MarketStats";
+import Highlights from "../components/Highlights";
 import CoinTable from "../components/CoinTable";
-import TopMovers from "../components/TopMovers";
-import InfoCards from "../components/InfoCard";
-import Hero from "../components/Hero";
-import Loader from "../components/Loader";
-import TrendingCoins from "../components/TrendingCoins";
-import { XCircle } from "lucide-react";
-import { DarkModeContext } from "../context/DarkModeContext";
-import GlobalStats from "../components/GlobalStats";
-import TopGainersLosers from "../components/TopGainLoss";
-import RecentlyAddedCoins from "../components/RecentlyAddedCoin";
-import Action from "../components/Action";
+import { Bar, ErrorNotice } from "../components/States";
 
-const Dashboard: React.FC = () => {
-  const [coins, setCoins] = useState<Coin[]>([]);
-  const [filteredCoins, setFilteredCoins] = useState<Coin[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [marketStats, setMarketStats] = useState<any>(null);
-  const [trending, setTrending] = useState<any[]>([]);
-  const [recentlyAdded, setRecentlyAdded] = useState<Coin[]>([]);
-  const context = useContext(DarkModeContext);
-
-  if (!context) {
-    throw new Error("Terms must be used within a DarkModeProvider");
-  }
-
-  const { isDark } = context;
-
-  const handleClear = () => setSearchTerm("");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await api.get<Coin[]>("/coins/markets", {
-          params: {
-            vs_currency: "usd",
-            order: "market_cap_desc",
-            per_page: 100,
-            page: 1,
-            sparkline: true,
-            price_change_percentage: "24h,7d",
-          },
-        });
-
-        setCoins(res.data);
-        setFilteredCoins(res.data);
-
-        // 🔹 Recently Added Coins (sort by market_cap_rank descending)
-        const recentlyAddedCoins = [...res.data]
-          .sort((a, b) => b.market_cap_rank - a.market_cap_rank)
-          .slice(0, 5);
-        setRecentlyAdded(recentlyAddedCoins);
-      } catch (err) {
-        setError(
-          `⚠️ Failed to fetch market data. Try again later. error: ${err}`
-        );
-        console.error(err);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const statsRes = await api.get("/global");
-        setMarketStats(statsRes.data.data);
-      } catch (err) {
-        console.error("Failed to fetch global stats:", err);
-        setMarketStats(null);
-      }
-
-      try {
-        const trendingRes = await api.get("/search/trending");
-        setTrending(trendingRes.data.coins);
-      } catch (err) {
-        console.error("Failed to fetch trending coins:", err);
-        setTrending([]);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  // 🔍 Filter coins by search
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredCoins(coins);
-    } else {
-      setFilteredCoins(
-        coins.filter((coin) =>
-          coin.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    }
-  }, [searchTerm, coins]);
-
-  return (
-    <div
-      className={`transition-colors duration-300 ${
-        isDark ? "bg-gray-900 text-white" : "bg-white text-black"
-      } min-h-screen`}
-    >
-      <Hero />
-
-      <div className="max-w-7xl mx-auto p-4 space-y-10">
-        {/* Global Market Stats */}
-        {marketStats && <GlobalStats marketStats={marketStats} />}
-
-        {/* Search / Filter */}
-        <div
-          className={`relative shadow-md rounded-xl flex items-center px-4 py-3 transition-colors ${
-            isDark ? "bg-gray-800" : "bg-white"
-          }`}
-        >
-          <img
-            src="/search.svg"
-            alt="Search"
-            className="w-5 h-5 mr-3 opacity-70"
-          />
-          <input
-            type="text"
-            placeholder="Search for a coin..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors ${
-              isDark
-                ? "bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-                : "bg-white border-gray-200 text-black placeholder-gray-500"
-            }`}
-          />
-          {searchTerm && (
-            <XCircle
-              onClick={handleClear}
-              className={`absolute right-6 cursor-pointer transition-colors ${
-                isDark
-                  ? "text-gray-400 hover:text-gray-200"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-              size={22}
-            />
-          )}
-        </div>
-
-        {/* Main & Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <main className="lg:col-span-2 space-y-8">
-            {loading ? (
-              <Loader message="Loading market data..." />
-            ) : error ? (
-              <div className="text-center py-10 text-red-600">{error}</div>
-            ) : (
-              <>
-                <CoinTable coins={filteredCoins} />
-
-                {/* Recently Added Coins */}
-                {recentlyAdded.length > 0 && (
-                  <RecentlyAddedCoins coins={recentlyAdded} />
-                )}
-              </>
-            )}
-          </main>
-
-          <aside className="space-y-8">
-            <InfoCards />
-            <TopMovers coins={coins} />
-            <TrendingCoins trending={trending} />
-            <TopGainersLosers coins={coins} />
-          </aside>
-        </div>
-        <Action />
-      </div>
-    </div>
-  );
+const MARKETS_PARAMS = {
+  vs_currency: "usd",
+  order: "market_cap_desc",
+  per_page: 100,
+  page: 1,
+  sparkline: true,
+  price_change_percentage: "24h,7d",
 };
 
-export default Dashboard;
+const REFRESH_MS = 120_000;
+
+export default function Dashboard() {
+  const markets = useApi<Coin[]>("/coins/markets", MARKETS_PARAMS, {
+    maxAgeMs: REFRESH_MS,
+    refreshMs: REFRESH_MS,
+    persist: true,
+  });
+  const global = useApi<{ data: GlobalMarket }>("/global", undefined, {
+    maxAgeMs: REFRESH_MS,
+    refreshMs: REFRESH_MS,
+    persist: true,
+  });
+  const trending = useApi<{ coins: { item: TrendingCoin }[] }>("/search/trending", undefined, {
+    maxAgeMs: 10 * 60_000,
+    persist: true,
+  });
+
+  const g = global.data?.data;
+  const trendingCoins = trending.data?.coins.map((c) => c.item) ?? (trending.error ? [] : undefined);
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6">
+      <header className="pt-8 sm:pt-10">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-[28px]">Crypto prices by market cap</h1>
+        <div className="mt-2 max-w-3xl text-muted">
+          {g ? (
+            <p>
+              The crypto market is worth{" "}
+              <span className="num text-fg">{formatCompactCurrency(g.total_market_cap.usd)}</span> today,{" "}
+              <span className={g.market_cap_change_percentage_24h_usd >= 0 ? "text-up" : "text-down"}>
+                {g.market_cap_change_percentage_24h_usd >= 0 ? "up" : "down"}{" "}
+                <span className="num">{formatPercent(g.market_cap_change_percentage_24h_usd)}</span>
+              </span>{" "}
+              on yesterday, with <span className="num text-fg">{formatCompactCurrency(g.total_volume.usd)}</span>{" "}
+              traded in the last 24 hours. New to the jargon?{" "}
+              <Link to="/terms" className="text-fg underline decoration-line-strong underline-offset-2 hover:decoration-fg">
+                Read the glossary
+              </Link>
+              .
+            </p>
+          ) : global.error ? (
+            <p>Live prices for the 100 largest cryptocurrencies, refreshed every couple of minutes.</p>
+          ) : (
+            <div className="space-y-2 pt-1">
+              <Bar className="h-4 w-full max-w-xl" />
+              <Bar className="h-4 w-2/3 max-w-md" />
+            </div>
+          )}
+        </div>
+      </header>
+
+      {(g || !global.error) && <MarketStats data={g} />}
+
+      {/* Nothing saved to fall back on: explain, and keep the skeletons so the page doesn't look broken. */}
+      {markets.error && !markets.data && (
+        <ErrorNotice
+          message={`${markets.error.message} Retrying automatically…`}
+          onRetry={markets.reload}
+        />
+      )}
+
+      <Highlights coins={markets.data} trending={trendingCoins} />
+      <CoinTable
+        coins={markets.data}
+        updatedAt={markets.updatedAt}
+        stale={Boolean(markets.error && markets.data)}
+        refreshing={markets.refreshing}
+        onRefresh={markets.reload}
+      />
+    </div>
+  );
+}

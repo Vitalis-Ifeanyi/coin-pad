@@ -1,99 +1,155 @@
-import React from "react";
-import MiniChart from "../chart/MiniChart";
+import { useEffect, useRef, type ReactNode } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, X } from "lucide-react";
 import type { Coin } from "../types/coin";
+import { DASH, formatCompact, formatCompactCurrency, formatPercent, formatPrice, formatTime } from "../lib/format";
+import Change from "./Change";
+import Sparkline from "./Sparkline";
 
-interface CoinDetailsModalProps {
-  coin: Coin;
-  isOpen: boolean;
+interface CoinDetailsProps {
+  coin: Coin | null;
   onClose: () => void;
 }
 
-const CoinDetailsModal: React.FC<CoinDetailsModalProps> = ({
-  coin,
-  isOpen,
-  onClose,
-}) => {
-  if (!isOpen) return null;
+/** Native <dialog>: focus trapping, Escape and top-layer stacking come for free. */
+export default function CoinDetails({ coin, onClose }: CoinDetailsProps) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (coin && !dialog.open) dialog.showModal();
+    if (!coin && dialog.open) dialog.close();
+  }, [coin]);
+
+  useEffect(() => {
+    if (!coin) return;
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = prev;
+    };
+  }, [coin]);
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm"
-      onClick={onClose}
+    <dialog
+      ref={ref}
+      onClose={onClose}
+      // The inner wrapper covers the dialog box, so a click landing on the
+      // <dialog> element itself can only be on the backdrop.
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      aria-labelledby="coin-details-title"
+      className="m-auto max-h-[88vh] w-[min(40rem,calc(100%-2rem))] overflow-y-auto rounded-xl border border-line bg-surface p-0 text-fg shadow-2xl"
     >
-      <div
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 w-11/12 max-w-3xl relative transition-transform transform scale-95 animate-scale-in"
-        onClick={(e) => e.stopPropagation()} // prevent modal from closing when clicking inside
-      >
+      {coin && <Body coin={coin} onClose={onClose} />}
+    </dialog>
+  );
+}
+
+function Body({ coin, onClose }: { coin: Coin; onClose: () => void }) {
+  const symbol = coin.symbol.toUpperCase();
+
+  return (
+    <div className="p-5 sm:p-6">
+      <header className="flex items-start gap-3">
+        <img src={coin.image} alt="" width={36} height={36} className="size-9 rounded-full" />
+        <div className="min-w-0 flex-1">
+          <h2 id="coin-details-title" className="text-lg leading-tight font-semibold">
+            {coin.name}
+          </h2>
+          <p className="font-mono text-xs text-faint">
+            {symbol} · Rank #{coin.market_cap_rank ?? DASH}
+          </p>
+        </div>
         <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white text-lg font-bold"
+          type="button"
           onClick={onClose}
+          aria-label="Close"
+          className="-mt-1 -mr-1 grid size-8 place-items-center rounded-md text-muted hover:bg-sunken hover:text-fg"
         >
-          ✖
+          <X size={18} />
         </button>
+      </header>
 
-        <div className="flex items-center gap-4 mb-6">
-          <img
-            src={coin.image}
-            alt={coin.name}
-            className="w-16 h-16 rounded-full shadow-lg"
-          />
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {coin.name} ({coin.symbol.toUpperCase()})
-            </h2>
-            <p className="text-lg text-gray-700 dark:text-gray-300">
-              ${coin.current_price?.toLocaleString() ?? 'N/A'}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="space-y-2 text-gray-800 dark:text-gray-200">
-            <p>
-              <strong>Market Cap:</strong> ${coin.market_cap?.toLocaleString() ?? 'N/A'}
-            </p>
-            <p>
-              <strong>24h Change:</strong>{" "}
-              <span
-                className={
-                  coin.price_change_percentage_24h != null && coin.price_change_percentage_24h > 0
-                    ? "text-green-500"
-                    : coin.price_change_percentage_24h != null && coin.price_change_percentage_24h < 0
-                    ? "text-red-500"
-                    : "text-gray-500"
-                }
-              >
-                {coin.price_change_percentage_24h?.toFixed(2) ?? 'N/A'}%
-              </span>
-            </p>
-            <p>
-              <strong>All-Time High:</strong> ${coin.ath?.toLocaleString() ?? 'N/A'}
-            </p>
-            <p>
-              <strong>All-Time Low:</strong> ${coin.atl?.toLocaleString() ?? 'N/A'}
-            </p>
-            <p>
-              <strong>Circulating / Total Supply:</strong>{" "}
-              {coin.circulating_supply?.toLocaleString() ?? 'N/A'} /{" "}
-              {coin.total_supply?.toLocaleString() || "N/A"}
-            </p>
-            <p>
-              <strong>Market Cap Rank:</strong> #{coin.market_cap_rank}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl p-4 shadow-inner">
-            <MiniChart
-              prices={coin.sparkline_in_7d?.price || []}
-              isPositive={coin.price_change_percentage_24h > 0}
-              width={256}
-              height={128}
-            />
-          </div>
-        </div>
+      <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <p className="num text-3xl font-medium tracking-tight">{formatPrice(coin.current_price)}</p>
+        <Change value={coin.price_change_percentage_24h} pill className="text-sm" />
+        <span className="text-xs text-faint">24h</span>
       </div>
+
+      <div className="mt-5 rounded-lg border border-line bg-canvas px-3 pt-3 pb-2">
+        <Sparkline prices={coin.sparkline_in_7d?.price} width={560} height={110} fill className="block h-[110px] w-full" />
+        <p className="mt-1 flex justify-between text-[11px] text-faint">
+          <span>7 days ago</span>
+          <Change value={coin.price_change_percentage_7d_in_currency} className="text-[11px]" />
+          <span>Now</span>
+        </p>
+      </div>
+
+      <RangeBar low={coin.low_24h} high={coin.high_24h} current={coin.current_price} />
+
+      <dl className="mt-5 grid grid-cols-1 gap-x-8 sm:grid-cols-2">
+        <Row label="Market cap">{formatCompactCurrency(coin.market_cap)}</Row>
+        <Row label="Fully diluted value">{formatCompactCurrency(coin.fully_diluted_valuation)}</Row>
+        <Row label="24h volume">{formatCompactCurrency(coin.total_volume)}</Row>
+        <Row label="Circulating supply">
+          {formatCompact(coin.circulating_supply)} {symbol}
+        </Row>
+        <Row label="All-time high">
+          {formatPrice(coin.ath)}
+          {coin.ath_change_percentage != null && (
+            <span className="ml-1.5 text-xs text-faint">{formatPercent(coin.ath_change_percentage, 1)} below</span>
+          )}
+        </Row>
+        <Row label="Max supply">{coin.max_supply ? `${formatCompact(coin.max_supply)} ${symbol}` : "No cap"}</Row>
+        <Row label="All-time low">{formatPrice(coin.atl)}</Row>
+        <Row label="Total supply">{coin.total_supply ? `${formatCompact(coin.total_supply)} ${symbol}` : DASH}</Row>
+      </dl>
+
+      <footer className="mt-6 flex items-center justify-between gap-3">
+        <p className="text-xs text-faint">
+          {coin.last_updated && `Price as of ${formatTime(new Date(coin.last_updated).getTime())}`}
+        </p>
+        <Link
+          to={`/analytics?coin=${encodeURIComponent(coin.id)}`}
+          onClick={onClose}
+          className="inline-flex items-center gap-1.5 rounded-md bg-fg px-3 py-1.5 text-sm font-medium text-canvas hover:opacity-90"
+        >
+          Candlestick chart <ArrowRight size={14} />
+        </Link>
+      </footer>
     </div>
   );
-};
+}
 
-export default CoinDetailsModal;
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-b border-line py-2 text-sm">
+      <dt className="text-muted">{label}</dt>
+      <dd className="num text-right">{children}</dd>
+    </div>
+  );
+}
+
+function RangeBar({ low, high, current }: { low: number | null; high: number | null; current: number | null }) {
+  if (low == null || high == null || current == null || high <= low) return null;
+  const pos = Math.min(100, Math.max(0, ((current - low) / (high - low)) * 100));
+
+  return (
+    <div className="mt-5">
+      <p className="mb-2 text-xs text-muted">24h range</p>
+      <div className="relative h-1 rounded-full bg-sunken">
+        <span className="absolute inset-y-0 left-0 rounded-full bg-line-strong" style={{ width: `${pos}%` }} />
+        <span
+          className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-fg"
+          style={{ left: `${pos}%` }}
+        />
+      </div>
+      <p className="num mt-1.5 flex justify-between text-xs text-muted">
+        <span>{formatPrice(low)}</span>
+        <span>{formatPrice(high)}</span>
+      </p>
+    </div>
+  );
+}

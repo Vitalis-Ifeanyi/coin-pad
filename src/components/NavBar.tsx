@@ -1,86 +1,75 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import DarkModeToggle from "./DarkMode";
+import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 
-const navData = [
-  { name: "Dashboard", path: "/" },
-  { name: "Analytics", path: "/analytics" },
-  { name: "Terms", path: "/terms" },
+const links = [
+  { label: "Markets", to: "/" },
+  { label: "Charts", to: "/analytics" },
+  { label: "Glossary", to: "/terms" },
 ];
 
-const Navbar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+export default function NavBar() {
+  const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  // Close the mobile menu after navigating.
+  useEffect(() => setOpen(false), [pathname]);
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <Link
-          to="/"
-          className="text-2xl font-heading font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent"
-        >
-          <img
-            src="/Coin-pad.svg"
-            alt="CoinPad Logo"
-            className="inline-block w-10 h-10"
-          />{" "}
-          <span>COIN PAD</span>
-        </Link>
+    <header className="sticky top-0 z-40 border-b border-line bg-canvas/95 backdrop-blur supports-[backdrop-filter]:bg-canvas/80">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-8 px-4 sm:px-6">
+        <Logo />
 
-        <div className="hidden md:flex gap-8 text-gray-700 font-medium">
-          {navData.map((item, index) => (
-            <Link
-              key={index}
-              to={item.path}
-              className={`relative transition duration-300 ${
-                location.pathname === item.path
-                  ? "text-blue-600 font-semibold"
-                  : "hover:text-blue-600"
-              }`}
+        <nav className="hidden h-full items-stretch gap-6 md:flex" aria-label="Main">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end
+              className={({ isActive }) =>
+                `-mb-px flex items-center border-b-2 text-sm transition-colors ${
+                  isActive ? "border-fg text-fg" : "border-transparent text-muted hover:text-fg"
+                }`
+              }
             >
-              {item.name}
-
-              {location.pathname === item.path && (
-                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-600 rounded"></span>
-              )}
-            </Link>
+              {link.label}
+            </NavLink>
           ))}
-          <DarkModeToggle />
-        </div>
+        </nav>
 
-        <button
-          className="md:hidden text-gray-700 focus:outline-none"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`md:hidden bg-white border-t px-4 py-4 space-y-3 transition-all duration-300 ${
-          isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
-        }`}
-      >
-        <DarkModeToggle />
-        {navData.map((item, index) => (
-          <Link
-            key={index}
-            to={item.path}
-            onClick={() => setIsOpen(false)}
-            className={`block px-2 py-1 rounded-lg transition ${
-              location.pathname === item.path
-                ? "text-blue-600 font-semibold bg-blue-50"
-                : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-            }`}
+        <div className="ml-auto flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="grid size-8 place-items-center rounded-md text-muted hover:bg-sunken hover:text-fg md:hidden"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "Close menu" : "Open menu"}
           >
-            {item.name}
-          </Link>
-        ))}
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </div>
-    </nav>
-  );
-};
 
-export default Navbar;
+      {open && (
+        <nav id="mobile-nav" className="border-t border-line px-4 py-2 md:hidden" aria-label="Main">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end
+              className={({ isActive }) =>
+                `block rounded-md px-2 py-2.5 text-sm ${isActive ? "bg-sunken font-medium text-fg" : "text-muted"}`
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+      )}
+    </header>
+  );
+}
