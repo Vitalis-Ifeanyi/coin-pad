@@ -74,7 +74,7 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
     return (
       <th
         scope="col"
-        className={`px-3 py-2.5 font-medium ${className}`}
+        className={`px-2 py-2.5 font-medium sm:px-3 ${className}`}
         aria-sort={active ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}
       >
         <button
@@ -138,12 +138,14 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
         </label>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      {/* `relative` matters: without it, absolutely positioned descendants (the sr-only
+          labels in <Change>) escape this scroller and widen the whole page on phones. */}
+      <div className="relative overflow-x-auto">
+        <table className="w-full text-sm [&_tr>*:first-child]:pl-4 [&_tr>*:last-child]:pr-4">
           <thead className="border-b border-line text-left text-xs text-muted">
             <tr>
-              {th("rank", "#", "w-12 text-left")}
-              <th scope="col" className="px-3 py-2.5 font-medium">
+              {th("rank", "#", "hidden w-12 text-left sm:table-cell")}
+              <th scope="col" className="w-full px-2 py-2.5 font-medium sm:px-3">
                 Coin
               </th>
               {th("price", "Price", "text-right")}
@@ -151,7 +153,7 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
               {th("change7d", "7d", "hidden text-right sm:table-cell")}
               {th("marketCap", "Market cap", "hidden text-right md:table-cell")}
               {th("volume", "Volume 24h", "hidden text-right lg:table-cell")}
-              <th scope="col" className="hidden px-3 py-2.5 text-right font-medium lg:table-cell">
+              <th scope="col" className="hidden px-2 py-2.5 text-right font-medium sm:px-3 lg:table-cell">
                 Last 7 days
               </th>
             </tr>
@@ -170,11 +172,12 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
 
             {rows?.map((coin) => (
               <tr key={coin.id} onClick={() => setSelected(coin)} className="cursor-pointer hover:bg-sunken/60">
-                <Td className="text-faint">{coin.market_cap_rank ?? "—"}</Td>
-                <td className="px-3 py-2.5">
+                <Td className="hidden text-faint sm:table-cell">{coin.market_cap_rank ?? "—"}</Td>
+                {/* w-full + max-w-0: this column takes the leftover width and the name truncates to fit. */}
+                <td className="w-full max-w-0 px-2 py-2.5 sm:px-3">
                   <button
                     type="button"
-                    className="flex min-w-0 items-center gap-2.5 text-left"
+                    className="flex w-full min-w-0 items-center gap-2 text-left sm:gap-2.5"
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelected(coin);
@@ -188,8 +191,8 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
                       loading="lazy"
                       className="size-[22px] shrink-0 rounded-full"
                     />
-                    <span className="max-w-[8.5rem] truncate font-medium sm:max-w-[15rem]">{coin.name}</span>
-                    <span className="hidden font-mono text-xs text-faint uppercase sm:inline">{coin.symbol}</span>
+                    <span className="min-w-0 truncate font-medium">{coin.name}</span>
+                    <span className="hidden shrink-0 font-mono text-xs text-faint uppercase sm:inline">{coin.symbol}</span>
                   </button>
                 </td>
                 <Td className="text-right">{formatPrice(coin.current_price)}</Td>
@@ -201,7 +204,7 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
                 </Td>
                 <Td className="hidden text-right md:table-cell">{formatCompactCurrency(coin.market_cap)}</Td>
                 <Td className="hidden text-right text-muted lg:table-cell">{formatCompactCurrency(coin.total_volume)}</Td>
-                <td className="hidden px-3 py-1.5 lg:table-cell">
+                <td className="hidden px-2 py-1.5 sm:px-3 lg:table-cell">
                   <Sparkline prices={coin.sparkline_in_7d?.price} width={112} height={32} className="ml-auto block" />
                 </td>
               </tr>
@@ -216,13 +219,13 @@ export default function CoinTable({ coins, updatedAt, stale, refreshing, onRefre
 }
 
 function Td({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <td className={`num px-3 py-2.5 whitespace-nowrap ${className}`}>{children}</td>;
+  return <td className={`num px-2 py-2.5 whitespace-nowrap sm:px-3 ${className}`}>{children}</td>;
 }
 
 function SkeletonRows() {
   return Array.from({ length: 12 }, (_, i) => (
     <tr key={i}>
-      <td className="px-3 py-3">
+      <td className="hidden px-3 py-3 sm:table-cell">
         <Bar className="h-3 w-5" />
       </td>
       <td className="px-3 py-3">

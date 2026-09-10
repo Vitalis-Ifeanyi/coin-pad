@@ -90,6 +90,41 @@
   }
 }
 
+/* Coin details: slides up as a sheet on phones, fades in as a dialog above that. */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+.coin-sheet[open] {
+  animation: sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.coin-sheet[open]::backdrop {
+  animation: backdrop-in 220ms ease-out;
+}
+@media (width >= 40rem) {
+  .coin-sheet[open] {
+    animation: dialog-in 160ms ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coin-sheet[open],
+  .coin-sheet[open]::backdrop {
+    animation: none;
+  }
+}
+
 @utility num {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;

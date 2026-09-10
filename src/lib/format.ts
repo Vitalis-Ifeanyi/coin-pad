@@ -23,7 +23,10 @@ export function formatPrice(value: number | null | undefined, currency = "usd") 
   const abs = Math.abs(value);
   const base: Intl.NumberFormatOptions = { style: "currency", currency: currency.toUpperCase() };
   if (abs === 0) return nf({ ...base, maximumFractionDigits: 2 }).format(0);
-  if (abs < 1) return nf({ ...base, minimumSignificantDigits: 4, maximumSignificantDigits: 4 }).format(value);
+  // Values like 0.99996 round up to 1.000 at 4 significant digits; show those as $1.00.
+  if (Number(abs.toPrecision(4)) < 1) {
+    return nf({ ...base, minimumSignificantDigits: 4, maximumSignificantDigits: 4 }).format(value);
+  }
   return nf({ ...base, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
 
